@@ -21,8 +21,8 @@ const postSuccess = res => id => {
   res.status(201).json(id);
 };
 const serverErrorPost = res => err => {
-    res.status(422).json(err);
-  };
+  res.status(422).json(err);
+};
 
 server.get("/games", (req, res) => {
   games
@@ -41,14 +41,16 @@ server.get("/games/:id", async (req, res) => {
 
 server.post("/games", (req, res) => {
   const body = req.body;
-  if (!body) {
-    res.status(500).json({ Error_Message: "Provide User Name" });
-  } else {
-    games
-      .insert(body)
-      .then(postSuccess(res))
-      .catch(serverErrorPost(res));
-  }
+  games.findByTitle(body.title).then(val => {
+    if (val !== undefined) {
+      res.status(405).json(val);
+    } else {
+      games
+        .insert(body)
+        .then(postSuccess(res))
+        .catch(serverErrorPost(res));
+    }
+  });
 });
 
 server.delete("/games/:id", (req, res) => {

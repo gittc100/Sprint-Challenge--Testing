@@ -2,7 +2,7 @@ const request = require("supertest");
 const server = require("./server.js");
 const db = require("../data/dbConfig");
 
-afterAll(async () => {
+afterEach(async () => {
   await db("games").truncate();
 });
 
@@ -42,16 +42,34 @@ describe("server.js", () => {
       expect(response.status).toEqual(201);
     });
     it("Missing Non Nullable Value (Table Incomplete) and Provide 422 Status Code", async () => {
-        const body = {
-          title: "Test Invalid"
-        };
-        let response = await request(server)
-          .post("/games")
-          .send(body);
-        console.log(response.status);
-        expect(response.status).toEqual(422);
-      });
+      const body = {
+        title: "Test Invalid"
+      };
+      let response = await request(server)
+        .post("/games")
+        .send(body);
+      console.log(response.status);
+      expect(response.status).toEqual(422);
+    });
+    it("Duplicate Value for Unique Key and Provide 405 Status Code", async () => {
+      let body = {
+        title: "Monopoly",
+        genre: "Board"
+      };
+      let response = await request(server)
+        .post("/games")
+        .send(body);
 
+      body = {
+        title: "Monopoly",
+        genre: "Board"
+      };
+      response = await request(server)
+        .post("/games")
+        .send(body);
+      console.log(response.status);
+      expect(response.status).toEqual(405);
+    });
   });
 
   //   describe("Delete / endpoint", () => {

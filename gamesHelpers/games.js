@@ -4,7 +4,8 @@ module.exports = {
   insert,
   remove,
   getAll,
-  findById
+  findById,
+  findByTitle
 };
 
 async function insert(game) {
@@ -29,3 +30,9 @@ function findById(id) {
     .where({ id })
     .first();
 }
+
+function findByTitle(title) {
+    return db("games")
+      .where({ title })
+      .first();
+  }
